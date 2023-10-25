@@ -19,6 +19,10 @@ import (
 
 const limit = 10
 
+// to run with e5-small-v2
+// GOARCH=amd64 CYBERTRON_MODEL=intfloat/e5-small-v2 CYBERTRON_MODELS_DIR=models go run ./examples/textencoding/
+// substitute model as required
+
 func main() {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	LoadDotenv()
@@ -32,17 +36,28 @@ func main() {
 	}
 	defer tasks.Finalize(m)
 
-	r1, err := m.Encode(context.Background(), "This is a happy person", int(bert.MeanPooling))
+	baseStr := "This is a happy person"
+
+	r1, err := m.Encode(context.Background(), baseStr, int(bert.MeanPooling))
 	if err != nil {
 		panic(err)
 	}
 
-	r2, err := m.Encode(context.Background(), "The cat is purring on my lap", int(bert.MeanPooling))
+	str1 := "Today is a sunny day"
+	r2, err := m.Encode(context.Background(), str1, int(bert.MeanPooling))
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(r2.Vector.Normalize2().DotUnitary(r1.Vector.Normalize2()))
+	str2 := "This is a happy dog"
+	r3, err := m.Encode(context.Background(), str2, int(bert.MeanPooling))
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("base sentence", baseStr)
+	fmt.Println("similarity score with", str1, r2.Vector.Normalize2().DotUnitary(r1.Vector.Normalize2()))
+	fmt.Println("similarity score with", str2, r3.Vector.Normalize2().DotUnitary(r1.Vector.Normalize2()))
 }
 
 func dotProduct[T []float64](a, b T) float64 {
