@@ -6,6 +6,7 @@ package bert
 
 import (
 	"encoding/json"
+	"math/big"
 	"os"
 )
 
@@ -52,7 +53,7 @@ type TokenizerConfig struct {
 	MaskToken            string      `json:"mask_token"`
 	TokenizeChineseChars bool        `json:"tokenize_chinese_chars"`
 	StripAccents         interface{} `json:"strip_accents"`
-	ModelMaxLength       int         `json:"model_max_length"`
+	ModelMaxLength       big.Int     `json:"model_max_length"`
 }
 
 // ConfigFile is the union of the configuration structures.
