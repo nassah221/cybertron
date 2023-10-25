@@ -7,7 +7,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	//lint:ignore ST1001 allow dot import just to make the example more readable
 	. "github.com/nlpodyssey/cybertron/examples"
@@ -33,17 +32,26 @@ func main() {
 	}
 	defer tasks.Finalize(m)
 
-	fn := func(text string) error {
-		result, err := m.Encode(context.Background(), text, int(bert.MeanPooling))
-		if err != nil {
-			return err
-		}
-		fmt.Println(result.Vector.Data().F64()[:limit])
-		return nil
+	r1, err := m.Encode(context.Background(), "This is a happy person", int(bert.MeanPooling))
+	if err != nil {
+		panic(err)
 	}
 
-	err = ForEachInput(os.Stdin, fn)
+	r2, err := m.Encode(context.Background(), "The cat is purring on my lap", int(bert.MeanPooling))
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		panic(err)
 	}
+
+	fmt.Println(r2.Vector.Normalize2().DotUnitary(r1.Vector.Normalize2()))
+}
+
+func dotProduct[T []float64](a, b T) float64 {
+	result := 0.0
+	if len(a) != len(b) {
+		panic("vector length not equal")
+	}
+	for i := 0; i < len(a); i++ {
+		result += a[i] * b[i]
+	}
+	return result
 }
